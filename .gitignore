@@ -1,1 +1,3 @@
 /djenv 
+.venv
+/app/migrations

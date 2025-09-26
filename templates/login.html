@@ -1,0 +1,27 @@
+<html>
+<head>
+<title>
+{{ translations.login }}
+</title>
+</head>
+<body>
+
+<p id="message">{{ message }}</p>
+<form method="post" action="{% url 'login' %}?language={{language}}">
+{% csrf_token %}
+
+<label for="username">{{ translations.username }}</label><br>
+<input id ="username" type="text" name="username" value="{{ username }}" required><br>
+<label for="password">{{ translations.password }}</label><br>
+<input id="password" type="password" name="password" required>
+
+<div>
+  <input type="submit" name="login" value="{{ translations.login }}" />
+  <input type="hidden" name="next" value="{{ next }}" />
+</div>
+</form>
+<br>
+<a id="register" href="{% url 'register' %}?language={{language}}">{{ translations.register }}</a>
+
+</body>
+</html>

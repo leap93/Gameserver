@@ -10,12 +10,15 @@
 <p>{{translations.front_page_text_2}}</p>
 
 {% load extras %}
-
-<select name="language" id="language" onchange="location.reload();">
+<br>
+<p>{{translations.page_language}}</p>
+<form action="{% url 'front_page' %}" id="language_form" method="post">
+{% csrf_token %}
+<select name="language" id="language" onchange="document.getElementById('language_form').submit()">
     {% for language_option in languages %}
     <option value="{{ language_option.0 }}" {% if language_option.0 == language %}selected{% endif %}>{{ translations|access:language_option.0 }}</option>
     {% endfor %}
 </select>
-
+</form>
 </body>
 </html>

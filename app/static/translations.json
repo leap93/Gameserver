@@ -24,6 +24,8 @@
 	{"title": "logout", "language": "fi", "content": "kirjaudu ulos"},
 	{"title": "name", "language": "en", "content": "name"},
 	{"title": "name", "language": "fi", "content": "nimi"},
+	{"title": "page_language", "language": "en", "content": "Change page language"},
+	{"title": "page_language", "language": "fi", "content": "Vaihda sivun kieli"},
 	{"title": "password", "language": "en", "content": "password"},
 	{"title": "password", "language": "fi", "content": "salasana"},
 	{"title": "password2", "language": "en", "content": "password again"},

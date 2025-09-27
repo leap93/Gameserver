@@ -8,5 +8,163 @@
 {% include 'header.html' %}
 
 
+<style>
+
+table, th, td {
+  border: 1px solid black;
+}
+input {
+    width: 40px
+}
+{% load extras %}
+</style>
+
+<table>
+  <tr>
+    <th>
+	<input type="number" id="00" value="{{sudoku|first|first}}">
+	<input type="number" id="10" value="{{sudoku|first|second}}">
+	<input type="number" id="20" value="{{sudoku|third|first}}">
+	<br>
+	<input type="number" id="01" value="{{sudoku|first|second}}">
+	<input type="number" id="11" value="{{sudoku|second|second}}">
+	<input type="number" id="21" value="{{sudoku|third|second}}">
+	<br>
+	<input type="number" id="02" value="{{sudoku|first|third}}">
+	<input type="number" id="12" value="{{sudoku|second|third}}">
+	<input type="number" id="22" value="{{sudoku|third|third}}">
+	</th>
+	<th>
+	<input type="number" id="30" value="{{sudoku|forth|first}}">
+	<input type="number" id="40" value="{{sudoku|fifth|first}}">
+	<input type="number" id="50" value="{{sudoku|sixth|first}}">
+	<br>
+	<input type="number" id="31" value="{{sudoku|forth|second}}">
+	<input type="number" id="41" value="{{sudoku|fifth|second}}">
+	<input type="number" id="51" value="{{sudoku|sixth|second}}">
+	<br>
+	<input type="number" id="32" value="{{sudoku|forth|third}}">
+	<input type="number" id="42" value="{{sudoku|fifth|third}}">
+	<input type="number" id="52" value="{{sudoku|sixth|third}}">
+	</th>
+	<th>
+	<input type="number" id="60" value="{{sudoku|seventh|first}}">
+	<input type="number" id="70" value="{{sudoku|eighth|first}}">
+	<input type="number" id="80" value="{{sudoku|nineth|first}}">
+	<br>
+	<input type="number" id="61" value="{{sudoku|seventh|second}}">
+	<input type="number" id="71" value="{{sudoku|eighth|second}}">
+	<input type="number" id="81" value="{{sudoku|nineth|second}}">
+	<br>
+	<input type="number" id="62" value="{{sudoku|seventh|third}}">
+	<input type="number" id="72" value="{{sudoku|eighth|third}}">
+	<input type="number" id="82" value="{{sudoku|nineth|third}}">
+	</th>
+	</tr>
+	<tr>
+	<th>
+	<input type="number" id="03" value="{{sudoku|first|forth}}">
+	<input type="number" id="13" value="{{sudoku|second|forth}}">
+	<input type="number" id="23" value="{{sudoku|third|forth}}">
+	<br>
+	<input type="number" id="04" value="{{sudoku|first|fifth}}">
+	<input type="number" id="14" value="{{sudoku|second|fifth}}">
+	<input type="number" id="24" value="{{sudoku|third|fifth}}">
+	<br>
+	<input type="number" id="05" value="{{sudoku|first|sixth}}">
+	<input type="number" id="15" value="{{sudoku|second|sixth}}">
+	<input type="number" id="25" value="{{sudoku|third|sixth}}">
+	</th>
+	<th>
+	<input type="number" id="33" value="{{sudoku|forth|forth}}">
+	<input type="number" id="43" value="{{sudoku|fifth|forth}}">
+	<input type="number" id="53" value="{{sudoku|sixth|forth}}">
+	<br>
+	<input type="number" id="34" value="{{sudoku|forth|fifth}}">
+	<input type="number" id="44" value="{{sudoku|fifth|fifth}}">
+	<input type="number" id="54" value="{{sudoku|sixth|fifth}}">
+	<br>
+	<input type="number" id="35" value="{{sudoku|forth|sixth}}">
+	<input type="number" id="45" value="{{sudoku|fifth|sixth}}">
+	<input type="number" id="55" value="{{sudoku|sixth|sixth}}">
+	</th>
+	<th>
+	<input type="number" id="63" value="{{sudoku|seventh|forth}}">
+	<input type="number" id="73" value="{{sudoku|eighth|forth}}">
+	<input type="number" id="83" value="{{sudoku|nineth|forth}}">
+	<br>
+
+	<input type="number" id="64" value="{{sudoku|seventh|fifth}}">
+	<input type="number" id="74" value="{{sudoku|eighth|fifth}}">
+	<input type="number" id="84" value="{{sudoku|nineth|fifth}}">
+	<br>
+
+
+	<input type="number" id="65" value="{{sudoku|seventh|sixth}}">
+	<input type="number" id="75" value="{{sudoku|eighth|sixth}}">
+	<input type="number" id="85" value="{{sudoku|nineth|sixth}}">
+
+	</th>
+	</tr>
+	<tr>
+	<th>
+	<input type="number" id="06" value="{{sudoku|first|seventh}}">
+	<input type="number" id="16" value="{{sudoku|second|seventh}}">
+	<input type="number" id="26" value="{{sudoku|third|seventh}}">
+	<br>
+	<input type="number" id="07" value="{{sudoku|first|eighth}}">
+	<input type="number" id="17" value="{{sudoku|second|eighth}}">
+	<input type="number" id="27" value="{{sudoku|third|eighth}}">
+	<br>
+	<input type="number" id="08" value="{{sudoku|first|nineth}}">
+	<input type="number" id="18" value="{{sudoku|second|nineth}}">
+	<input type="number" id="28" value="{{sudoku|third|nineth}}">
+	</th>
+	<th>
+	<input type="number" id="36" value="{{sudoku|forth|seventh}}">
+	<input type="number" id="46" value="{{sudoku|fifth|seventh}}">
+	<input type="number" id="56" value="{{sudoku|sixth|seventh}}">
+	<br>
+	<input type="number" id="37" value="{{sudoku|forth|eighth}}">
+	<input type="number" id="47" value="{{sudoku|fifth|eighth}}">
+	<input type="number" id="57" value="{{sudoku|sixth|eighth}}">
+	<br>
+	<input type="number" id="38" value="{{sudoku|forth|nineth}}">
+	<input type="number" id="48" value="{{sudoku|fifth|nineth}}">
+	<input type="number" id="58" value="{{sudoku|sixth|nineth}}">
+	</th>
+	<th>
+	<input type="number" id="66" value="{{sudoku|seventh|seventh}}">
+	<input type="number" id="76" value="{{sudoku|eighth|seventh}}">
+	<input type="number" id="86" value="{{sudoku|nineth|seventh}}">
+	<br>
+	<input type="number" id="67" value="{{sudoku|seventh|eighth}}">
+	<input type="number" id="77" value="{{sudoku|eighth|eighth}}">
+	<input type="number" id="87" value="{{sudoku|nineth|eighth}}">
+	<br>
+	<input type="number" id="68" value="{{sudoku|seventh|nineth}}">
+	<input type="number" id="78" value="{{sudoku|eighth|nineth}}">
+	<input type="number" id="88" value="{{sudoku|nineth|nineth}}">
+	</th>
+</tr>
+</table>
+
+<script type="text/javascript">
+
+for(var x = 0; x <=8; x++){
+    for(var y = 0; y <=8; y++){
+        input = document.getElementById(x+""+y)
+        if(input.value == 0){
+            input.value = "";
+        }else{
+            input.readOnly = true;
+            input.style = "color: #FF0000;";
+        }
+    }
+
+}
+
+</script>
+
 </body>
 </html>

@@ -1,3 +1,5 @@
 /djenv 
 .venv
 /app/migrations
+/Gameserver/migrations
+db.sqlite3

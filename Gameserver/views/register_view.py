@@ -1,6 +1,8 @@
+from django.contrib.auth.models import User
 from django.db import IntegrityError
 from django.shortcuts import redirect, render
-from django.contrib.auth.models import User
+
+from app.models import UserInfo
 from app.utils import get_translations
 
 
@@ -23,11 +25,17 @@ def register_view(request):
         password = request.POST['password']
         email = request.POST['email']
 
+
+
         try:
             user = User.objects.create_user(username, email, password)
             context["message"] = context["translations"]["register_success"]
+            #create UserInfo
+            UserInfo.objects.create(user=user, language=language)
         except IntegrityError:
             context["message"] = context["translations"]["username_exists"]
             context["username"] = username
             context["email"] = email
+
+
     return render(request, 'register.html', context)

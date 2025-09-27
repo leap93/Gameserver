@@ -2,11 +2,20 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <title>{{translations.front_page}}</title>
 </head>
 <body>
 {% include 'header.html' %}
+<h2>{{translations.front_page_text_1}}</h2>
+<p>{{translations.front_page_text_2}}</p>
 
+{% load extras %}
+
+<select name="language" id="language" onchange="location.reload();">
+    {% for language_option in languages %}
+    <option value="{{ language_option.0 }}" {% if language_option.0 == language %}selected{% endif %}>{{ translations|access:language_option.0 }}</option>
+    {% endfor %}
+</select>
 
 </body>
 </html>

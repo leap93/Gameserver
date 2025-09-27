@@ -1,0 +1,10 @@
+from django import template
+register = template.Library()
+
+@register.filter(name='access')
+def access(value, arg):
+    if arg is None:
+        return "-"
+    if arg not in value:
+        return arg
+    return value[arg]

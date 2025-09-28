@@ -1,13 +1,28 @@
+from datetime import date
+
 from django.shortcuts import render
+
+from app.models import DailyPuzzle
 from app.utils import get_translations
-import random
+import random, json
+from datetime import datetime
 
 def sudoku_view(request):
     language = request.user.userinfo.language
-    context = {'translations': get_translations(language), "language": language, "sudoku": random_sudoku()}
+    now = datetime.now()
+    daily = DailyPuzzle.objects.filter(type="sudoku", created_at__date=date(now.year, now.month, now.day))
+    if len(daily) == 0:
+        sudoku = random_sudoku()
+        daily = DailyPuzzle.objects.create(type="sudoku", puzzle_text=json.dumps(sudoku))
+    else:
+        daily = daily[0]
+        sudoku = json.loads(daily.puzzle_text)
+    sudoku = solve_recursive_up(empty_sudoku(), empty_sudoku(), -1, 0)
+    context = {'translations': get_translations(language), "language": language, "sudoku": sudoku}
     print_sudoku(context["sudoku"])
-    return render(request, 'sudoku.html', context)
 
+
+    return render(request, 'sudoku.html', context)
 
 def random_sudoku():
     sudoku = empty_sudoku()

@@ -7,7 +7,7 @@ LANGUAGES = (
 )
 
 TYPE = (
-    ('sudoku', 'Sudoku')
+    ('sudoku', 'Sudoku'),
 )
 
 class UserInfo(models.Model):

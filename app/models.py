@@ -23,3 +23,12 @@ class DailyPuzzle(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     class Meta:
         app_label = 'Gameserver'
+
+class Play(models.Model):
+    puzzle = models.ForeignKey(DailyPuzzle, on_delete=models.CASCADE)
+    player = models.ForeignKey(User, on_delete=models.CASCADE)
+    time = models.IntegerField()
+    attempts = models.IntegerField()
+    created_at = models.DateTimeField(auto_now_add=True)
+    class Meta:
+        app_label = 'Gameserver'

@@ -17,7 +17,6 @@ def sudoku_view(request):
     else:
         daily = daily[0]
         sudoku = json.loads(daily.puzzle_text)
-    sudoku = solve_recursive_up(empty_sudoku(), empty_sudoku(), -1, 0)
     context = {'translations': get_translations(language), "language": language, "sudoku": sudoku}
     print_sudoku(context["sudoku"])
 

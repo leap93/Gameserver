@@ -1,0 +1,12 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{{translations.logout}}</title>
+</head>
+<body>
+<p id="message">{{translations.logged_out}}</p>
+
+<a href="{% url 'login' %}?language={{language}}">{{ translations.login }}</a>
+</body>
+</html>

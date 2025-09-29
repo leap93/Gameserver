@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -18,12 +19,11 @@ input {
 }
 {% load extras %}
 </style>
-
 <table>
   <tr>
     <th>
 	<input type="number" id="00" value="{{sudoku|first|first}}">
-	<input type="number" id="10" value="{{sudoku|first|second}}">
+	<input type="number" id="10" value="{{sudoku|second|first}}">
 	<input type="number" id="20" value="{{sudoku|third|first}}">
 	<br>
 	<input type="number" id="01" value="{{sudoku|first|second}}">
@@ -149,6 +149,10 @@ input {
 </tr>
 </table>
 
+    <br>
+<input type="button" value="Check" onclick="checking()"><br>
+<p id="message">{{message}}</p>
+
 <script type="text/javascript">
 
 for(var x = 0; x <=8; x++){
@@ -162,6 +166,129 @@ for(var x = 0; x <=8; x++){
         }
     }
 
+}
+
+function readSudoku(){
+	sudoku = [];
+	for(var x = 0; x < 9; x++){
+		row = []
+		for(var y = 0; y < 9; y++){
+			cell = document.getElementById(String(x)+String(y)).value;
+			if(cell == ""){
+				cell = 0;
+			}
+			row.push(parseInt(cell));
+		}
+		sudoku.push(row);
+	}
+	return sudoku;
+}
+
+function writeSudoku(sudoku){
+	for(var x = 0; x < 9; x++){
+		for(var y = 0; y < 9; y++){
+			document.getElementById(String(x)+String(y)).value = sudoku[x][y];
+		}
+	}
+}
+
+function checkRows(sudoku){
+	for(var y = 0; y < 9; y++){
+		found = []
+		for(var x = 0; x < 9; x++){
+			cell = sudoku[x][y]
+			if(cell == 0){
+				continue;
+			}
+			if(found.includes(cell)){
+				return false;
+			}
+			found.push(cell);
+		}
+	}
+	return true;
+}
+
+function checkColumns(sudoku){
+	for(var x = 0; x < 9; x++){
+		found = []
+		for(var y = 0; y < 9; y++){
+			cell = sudoku[x][y]
+			if(cell == 0){
+				continue;
+			}
+			if(found.includes(cell)){
+				return false;
+			}
+			found.push(cell);
+		}
+	}
+	return true;
+}
+
+function checkBox(sudoku, startX, startY){
+	found = []
+	for(var x = startX; x < startX + 3; x++){
+		for(var y = startY; y < startY + 3; y++){
+			cell = sudoku[x][y]
+			if(cell == 0){
+				continue;
+			}
+			if(found.includes(cell)){
+				return false;
+			}
+			found.push(cell);
+		}
+	}
+	return true;
+}
+
+function checkBoxes(sudoku){
+	for(var x = 0; x < 9; x = x + 3){
+		for(var y = 0; y < 9; y = y + 3){
+			if(!checkBox(sudoku, x, y)){
+				return false;
+			}
+		}
+	}
+	return true;
+}
+
+function checkSudoku(sudoku){
+	return checkBoxes(sudoku) && checkColumns(sudoku) && checkRows(sudoku);
+}
+
+function countZeros(sudoku){
+    var zeros = 0;
+	for(var x = 0; x < 9; x++){
+		for(var y = 0; y < 9; y++){
+			if(sudoku[x][y] == 0){
+				zeros++;
+			}
+		}
+	}
+	return zeros;
+}
+
+function checking(){
+	sudoku = readSudoku();
+	zeros = countZeros(sudoku);
+
+	if(zeros == 0){
+        if(checkSudoku(sudoku)){
+            document.getElementById("message").innerHTML = "Onnistuit!";
+        }else{
+            document.getElementById("message").innerHTML = "Virheitä!";
+        }
+	}else{
+	    if(zeros == 1){
+	        document.getElementById("message").innerHTML = "1 ruutu täyttämättä";
+	    }else{
+	        document.getElementById("message").innerHTML = zeros + " ruutua täyttämättä";
+	    }
+
+
+	}
 }
 
 </script>

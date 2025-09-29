@@ -1,33 +1,39 @@
 from datetime import date
-
 from django.shortcuts import render
-
 from app.models import DailyPuzzle
 from app.utils import get_translations
 import random, json
 from datetime import datetime
+import time
+
 
 def sudoku_view(request):
     language = request.user.userinfo.language
     now = datetime.now()
     daily = DailyPuzzle.objects.filter(type="sudoku", created_at__date=date(now.year, now.month, now.day))
+
+    context = {'translations': get_translations(language), "language": language}
     if len(daily) == 0:
-        sudoku = random_sudoku()
-        daily = DailyPuzzle.objects.create(type="sudoku", puzzle_text=json.dumps(sudoku))
+        sudoku = empty_sudoku()
+        message = context["translations"]["no_daily_sudoku"]
+        context["message"] = message
     else:
         daily = daily[0]
         sudoku = json.loads(daily.puzzle_text)
-    context = {'translations': get_translations(language), "language": language, "sudoku": sudoku}
-    print_sudoku(context["sudoku"])
-
-
+    context["sudoku"] = sudoku
     return render(request, 'sudoku.html', context)
+
+def create_daily_sudoku():
+    now = datetime.now()
+    daily = DailyPuzzle.objects.filter(type="sudoku", created_at__date=date(now.year, now.month, now.day))
+    if len(daily) == 0:
+        DailyPuzzle.objects.create(type="sudoku", puzzle_text=json.dumps(random_sudoku()))
 
 def random_sudoku():
     sudoku = empty_sudoku()
 
-    solved_up = solve_recursive_up(sudoku, copy_sudoku(sudoku), -1, 0)
-    solved_down = solve_recursive_down(sudoku, copy_sudoku(sudoku), -1, 0)
+    solved_up = solve_recursive_up(sudoku, copy_sudoku(sudoku), -1, 0, time.time() + 10)
+    solved_down = solve_recursive_down(sudoku, copy_sudoku(sudoku), -1, 0, time.time() + 10)
     counter = 0
     while solved_up != solved_down:
         while True:
@@ -41,13 +47,18 @@ def random_sudoku():
         else:
             sudoku[x][y] = solved_down[x][y]
 
-        if counter >= 20:
-            print("Up")
-            solved_up = solve_recursive_up(sudoku, copy_sudoku(sudoku), -1, 0)
-            print("Down")
-            solved_down = solve_recursive_down(sudoku, copy_sudoku(sudoku), -1, 0)
+        print("Up")
+        solved_up = solve_recursive_up(sudoku, copy_sudoku(sudoku), -1, 0, time.time() + 30)
+        print("Down")
+        solved_down = solve_recursive_down(sudoku, copy_sudoku(sudoku), -1, 0, time.time() + 30)
         counter = counter + 1
         print(counter)
+        if counter > 35 or solved_up == -1 or solved_down == -1:
+            print("Creating new sudoku")
+            sudoku = empty_sudoku()
+            counter = 0
+            solved_up = solve_recursive_up(sudoku, copy_sudoku(sudoku), -1, 0, time.time() + 10)
+            solved_down = solve_recursive_down(sudoku, copy_sudoku(sudoku), -1, 0, time.time() + 10)
     return sudoku
 
 def print_sudoku(sudoku):
@@ -56,36 +67,41 @@ def print_sudoku(sudoku):
             print(sudoku[x][y], end=" ")
         print()
 
-def solve_recursive_up(sudoku, solved, x, y):
+def solve_recursive_up(sudoku, solved, x, y, timeout):
+    if time.time() > timeout:
+        print("STOP")
+        return -1
     for p in range(1, 10):
         next_coords = next_location(sudoku, x, y)
         x_next = next_coords[0]
         y_next = next_coords[1]
         solved[x_next][y_next] = p
-        if check_sudoku(solved):
+        if check_entry(solved, x_next, y_next, p):
             if x_next == 8 and y_next == 8:
                 return solved
-            result = solve_recursive_up(sudoku, solved, x_next, y_next)
+            result = solve_recursive_up(sudoku, solved, x_next, y_next, timeout)
             if result != 0:
                 return result
         solved[x_next][y_next] = 0
     return 0
 
-def solve_recursive_down(sudoku, solved, x, y):
+def solve_recursive_down(sudoku, solved, x, y, timeout):
+    if time.time() > timeout:
+        print("STOP")
+        return -1
     for p in range(9, 0, -1):
         next_coords = next_location(sudoku, x, y)
         x_next = next_coords[0]
         y_next = next_coords[1]
         solved[x_next][y_next] = p
-        if check_sudoku(solved):
+        if check_entry(solved, x_next, y_next, p):
             if x_next == 8 and y_next == 8:
                 return solved
-            result = solve_recursive_down(sudoku, solved, x_next, y_next)
+            result = solve_recursive_down(sudoku, solved, x_next, y_next, timeout)
             if result != 0:
                 return result
         solved[x_next][y_next] = 0
     return 0
-
 
 def next_location(sudoku, x, y):
     while True:
@@ -109,6 +125,42 @@ def check_rows(sudoku):
                 return False
             found.append(cell)
     return True
+
+def check_row_entry(sudoku, x, y, h):
+    for n in range(9):
+        if n == x:
+            continue
+        cell = sudoku[n][y]
+        if cell == h:
+            return False
+    return True
+
+def check_column_entry(sudoku, x, y, h):
+    for n in range(9):
+        if n == y:
+            continue
+        cell = sudoku[x][n]
+        if cell == h:
+            return False
+    return True
+
+def check_box_entry(sudoku, x, y, h):
+    x_corner = x
+    y_corner = y
+    while x_corner % 3 != 0:
+        x_corner -= 1
+    while y_corner % 3 != 0:
+        y_corner -= 1
+    for a in range(x_corner, x_corner + 3):
+        for b in range(y_corner, y_corner + 3):
+            if a == x and b == y:
+                continue
+            if sudoku[a][b] == h:
+                return False
+    return True
+
+def check_entry(sudoku, x, y, h):
+    return check_row_entry(sudoku, x, y, h) and check_column_entry(sudoku, x, y, h) and check_box_entry(sudoku, x, y, h)
 
 def check_columns(sudoku):
     for x in range(9):

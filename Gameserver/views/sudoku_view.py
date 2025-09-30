@@ -23,12 +23,6 @@ def sudoku_view(request):
     context["sudoku"] = sudoku
     return render(request, 'sudoku.html', context)
 
-def create_daily_sudoku():
-    now = datetime.now()
-    daily = DailyPuzzle.objects.filter(type="sudoku", created_at__date=date(now.year, now.month, now.day))
-    if len(daily) == 0:
-        DailyPuzzle.objects.create(type="sudoku", puzzle_text=json.dumps(random_sudoku()))
-
 def random_sudoku():
     sudoku = empty_sudoku()
 
@@ -47,14 +41,11 @@ def random_sudoku():
         else:
             sudoku[x][y] = solved_down[x][y]
 
-        print("Up")
-        solved_up = solve_recursive_up(sudoku, copy_sudoku(sudoku), -1, 0, time.time() + 30)
-        print("Down")
         solved_down = solve_recursive_down(sudoku, copy_sudoku(sudoku), -1, 0, time.time() + 30)
         counter = counter + 1
         print(counter)
         if counter > 35 or solved_up == -1 or solved_down == -1:
-            print("Creating new sudoku")
+            print("Starting over")
             sudoku = empty_sudoku()
             counter = 0
             solved_up = solve_recursive_up(sudoku, copy_sudoku(sudoku), -1, 0, time.time() + 10)

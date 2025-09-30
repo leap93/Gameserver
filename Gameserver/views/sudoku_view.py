@@ -44,7 +44,7 @@ def random_sudoku():
         solved_down = solve_recursive_down(sudoku, copy_sudoku(sudoku), -1, 0, time.time() + 30)
         counter = counter + 1
         print(counter)
-        if counter > 35 or solved_up == -1 or solved_down == -1:
+        if counter > 35 or solved_up == -1 or solved_down == -1 or solved_up == 0 or solved_down == 0:
             print("Starting over")
             sudoku = empty_sudoku()
             counter = 0

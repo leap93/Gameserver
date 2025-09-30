@@ -21,35 +21,51 @@ def sudoku_view(request):
         daily = daily[0]
         sudoku = json.loads(daily.puzzle_text)
     context["sudoku"] = sudoku
+
+
     return render(request, 'sudoku.html', context)
 
 def random_sudoku():
-    sudoku = empty_sudoku()
+    sudoku = initial_sudoku(15)
 
     solved_up = solve_recursive_up(sudoku, copy_sudoku(sudoku), -1, 0, time.time() + 10)
     solved_down = solve_recursive_down(sudoku, copy_sudoku(sudoku), -1, 0, time.time() + 10)
-    counter = 0
+    counter = 15
     while solved_up != solved_down:
-        while True:
-            x = random.randrange(0,9)
-            y = random.randrange(0,9)
-
-            if sudoku[x][y] == 0:
-                break
-        if random.randint(0, 1) == 1:
-            sudoku[x][y] = solved_up[x][y]
-        else:
-            sudoku[x][y] = solved_down[x][y]
-
-        solved_down = solve_recursive_down(sudoku, copy_sudoku(sudoku), -1, 0, time.time() + 30)
-        counter = counter + 1
         print(counter)
+
+        if solved_up != -1 and solved_down != -1:
+            while True:
+                x = random.randrange(0,9)
+                y = random.randrange(0,9)
+
+                if sudoku[x][y] == 0:
+                    break
+            if random.randint(0, 1) == 1:
+                sudoku[x][y] = solved_up[x][y]
+            else:
+                sudoku[x][y] = solved_down[x][y]
+        else:
+            move = smart_insert(sudoku)
+            sudoku[move[0]][move[1]] = move[2]
+
+        solved_down = solve_recursive_down(sudoku, copy_sudoku(sudoku), -1, 0, time.time() + 10)
+        if solved_down != 0 and solved_down != -1:
+            solved_up = solve_recursive_up(sudoku, copy_sudoku(sudoku), -1, 0, time.time() + 10)
+        counter += 1
         if counter > 35 or solved_up == -1 or solved_down == -1 or solved_up == 0 or solved_down == 0:
-            print("Starting over")
-            sudoku = empty_sudoku()
-            counter = 0
+            if counter > 35:
+                print("Too easy sudoku")
+            if solved_up == -1 or solved_down == -1:
+                print("Timeout")
+                continue
+            if solved_up == 0 or solved_down == 0:
+                print("No solution")
+            sudoku = initial_sudoku(10)
+            counter = 10
             solved_up = solve_recursive_up(sudoku, copy_sudoku(sudoku), -1, 0, time.time() + 10)
             solved_down = solve_recursive_down(sudoku, copy_sudoku(sudoku), -1, 0, time.time() + 10)
+
     return sudoku
 
 def print_sudoku(sudoku):
@@ -60,7 +76,6 @@ def print_sudoku(sudoku):
 
 def solve_recursive_up(sudoku, solved, x, y, timeout):
     if time.time() > timeout:
-        print("STOP")
         return -1
     for p in range(1, 10):
         next_coords = next_location(sudoku, x, y)
@@ -78,7 +93,6 @@ def solve_recursive_up(sudoku, solved, x, y, timeout):
 
 def solve_recursive_down(sudoku, solved, x, y, timeout):
     if time.time() > timeout:
-        print("STOP")
         return -1
     for p in range(9, 0, -1):
         next_coords = next_location(sudoku, x, y)
@@ -104,18 +118,6 @@ def next_location(sudoku, x, y):
             return [8, 8]
         if sudoku[x][y] == 0:
             return [x, y]
-
-def check_rows(sudoku):
-    for y in range(9):
-        found = []
-        for x in range(9):
-            cell = sudoku[x][y]
-            if cell == 0:
-                continue
-            if cell in found:
-                return False
-            found.append(cell)
-    return True
 
 def check_row_entry(sudoku, x, y, h):
     for n in range(9):
@@ -153,41 +155,6 @@ def check_box_entry(sudoku, x, y, h):
 def check_entry(sudoku, x, y, h):
     return check_row_entry(sudoku, x, y, h) and check_column_entry(sudoku, x, y, h) and check_box_entry(sudoku, x, y, h)
 
-def check_columns(sudoku):
-    for x in range(9):
-        found = []
-        for y in range(9):
-            cell = sudoku[x][y]
-            if cell == 0:
-                continue
-            if cell in found:
-                return False
-            found.append(cell)
-    return True
-
-def check_box(sudoku, start_x, start_y):
-    found = []
-    for x in range(start_x, start_x + 3):
-        for y in range(start_y, start_y + 3):
-            cell = sudoku[x][y]
-            if cell == 0:
-                continue
-            if cell in found:
-                return False
-            found.append(cell)
-    return True
-
-def check_boxes(sudoku):
-    for x in range(0, 9, 3):
-        for y in range(0, 9, 3):
-            if not check_box(sudoku, x, y):
-                return False
-    return True
-
-def check_sudoku(sudoku):
-    return check_boxes(sudoku) and check_columns(sudoku) and check_rows(sudoku)
-
-
 def empty_sudoku():
     sudoku = []
     for x in range(0, 9):
@@ -203,3 +170,52 @@ def copy_sudoku(sudoku):
         for y in range(0, 9):
             solved[x][y] = sudoku[x][y]
     return solved
+
+def possibilities(sudoku):
+    possibles = []
+    for x in range(0, 9):
+        row = []
+        for y in range(0, 9):
+            if sudoku[x][y] != 0:
+                row.append([])
+                continue
+            cell = []
+            for h in range(1, 10):
+                if check_entry(sudoku, x, y, h):
+                    cell.append(h)
+            row.append(cell)
+        possibles.append(row)
+    return possibles
+
+def smart_insert(sudoku):
+    possibles = possibilities(sudoku)
+    counts = []
+    biggest = 0
+    biggest_count = 0
+    for x in range(0, 9):
+        row = []
+        for y in range(0, 9):
+            amount = len(possibles[x][y])
+
+            if amount > biggest:
+                biggest_count = 0
+                biggest = amount
+            if amount == biggest:
+                biggest_count += 1
+            row.append(amount)
+        counts.append(row)
+
+    where_to_pick = random.randint(1, biggest_count)
+    for x in range(0, 9):
+        for y in range(0, 9):
+            if counts[x][y] == biggest:
+                where_to_pick -= 1
+                if where_to_pick == 0:
+                    return [x, y, random.choice(possibles[x][y])]
+
+def initial_sudoku(n):
+    sudoku = empty_sudoku()
+    for x in range(0, n):
+        next_insert = smart_insert(sudoku)
+        sudoku[next_insert[0]][next_insert[1]] = next_insert[2]
+    return sudoku

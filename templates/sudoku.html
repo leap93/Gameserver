@@ -10,11 +10,15 @@
 
 
 <style>
+table{
+  table-layout:fixed;
+}
+
 table, th, td {
   border: 1px solid black;
 }
 input {
-    width: 40px
+    width: 30px
 }
 {% load extras %}
 </style>
@@ -149,8 +153,13 @@ input {
 </table>
 
     <br>
-<input type="button" value="Check" onclick="checking()"><br>
+<button type="button" value="Check" onclick="checking()">Check</button><br>
 <p id="message">{{message}}</p>
+
+<form id="success" method="POST" action="{% url 'sudoku' %}">
+    {% csrf_token %}
+    <input type="hidden" name="time" id="time">
+</form>
 
 <script type="text/javascript">
 
@@ -272,12 +281,17 @@ function countZeros(sudoku){
 function checking(){
 	sudoku = readSudoku();
 	zeros = countZeros(sudoku);
-
 	if(zeros == 0){
         if(checkSudoku(sudoku)){
-            document.getElementById("message").innerHTML = "Onnistuit!";
+            timediff = Math.round((performance.now() - startTime)/1000)
+            mins = Math.floor(timediff/60);
+            secs = timediff % 60
+            document.getElementById("message").innerHTML = "Onnistuit! Aikaa kului "+mins+" minuuttia ja"+secs+" sekunttia.";
+            document.getElementById("time").value = timediff;
+            document.getElementById("success").submit();
+
         }else{
-            document.getElementById("message").innerHTML = "Virheitä!";
+            document.getElementById("message").innerHTML = "Virheitä ratksaisussa!";
         }
 	}else{
 	    if(zeros == 1){
@@ -289,6 +303,7 @@ function checking(){
 
 	}
 }
+const startTime = performance.now()
 
 </script>
 

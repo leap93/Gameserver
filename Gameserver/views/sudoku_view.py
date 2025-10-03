@@ -1,6 +1,6 @@
 from datetime import date
 from django.shortcuts import render
-from app.models import DailyPuzzle
+from app.models import DailyPuzzle, Play
 from app.utils import get_translations
 import random, json
 from datetime import datetime
@@ -12,6 +12,10 @@ def sudoku_view(request):
     now = datetime.now()
     daily = DailyPuzzle.objects.filter(type="sudoku", created_at__date=date(now.year, now.month, now.day))
 
+    if request.method == "POST":
+        dailies = Play.objects.filter(type="sudoku", created_at__date=date(now.year, now.month, now.day), player=request.user)
+        if len(dailies) == 0:
+            Play.objects.create(type="sudoku", created_at__date=date(now.year, now.month, now.day), player=request, attempts=1, time=request.POST['time'])
     context = {'translations': get_translations(language), "language": language}
     if len(daily) == 0:
         sudoku = empty_sudoku()
@@ -21,7 +25,7 @@ def sudoku_view(request):
         daily = daily[0]
         sudoku = json.loads(daily.puzzle_text)
     context["sudoku"] = sudoku
-
+    context["sudoku"] = solve_recursive_up(empty_sudoku(), empty_sudoku(), -1, 0, time.time() + 10)
 
     return render(request, 'sudoku.html', context)
 
@@ -31,7 +35,7 @@ def random_sudoku():
     solved_up = solve_recursive_up(sudoku, copy_sudoku(sudoku), -1, 0, time.time() + 10)
     solved_down = solve_recursive_down(sudoku, copy_sudoku(sudoku), -1, 0, time.time() + 10)
     counter = 15
-    while solved_up != solved_down:
+    while solved_up != solved_down and counter <= 20:
         print(counter)
 
         if solved_up != -1 and solved_down != -1:

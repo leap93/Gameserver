@@ -11,21 +11,33 @@ def sudoku_view(request):
     language = request.user.userinfo.language
     now = datetime.now()
     daily = DailyPuzzle.objects.filter(type="sudoku", created_at__date=date(now.year, now.month, now.day))
+    context = {'translations': get_translations(language), "language": language, "solved": 0}
 
+    #Create Play obejct if player has completed the sudoku
     if request.method == "POST":
-        dailies = Play.objects.filter(type="sudoku", created_at__date=date(now.year, now.month, now.day), player=request.user)
+        dailies = Play.objects.filter(puzzle=daily, created_at__date=date(now.year, now.month, now.day), player=request.user)
         if len(dailies) == 0:
-            Play.objects.create(type="sudoku", created_at__date=date(now.year, now.month, now.day), player=request, attempts=1, time=request.POST['time'])
-    context = {'translations': get_translations(language), "language": language}
+            Play.objects.create(puzzle=daily, player=request.user, attempts=1, time=request.POST['time'])
+
+    #Error message if daily sudoku is not created
     if len(daily) == 0:
         sudoku = empty_sudoku()
         message = context["translations"]["no_daily_sudoku"]
         context["message"] = message
     else:
+        #Load daily sudoku from database
         daily = daily[0]
         sudoku = json.loads(daily.puzzle_text)
-    context["sudoku"] = sudoku
-    context["sudoku"] = solve_recursive_up(empty_sudoku(), empty_sudoku(), -1, 0, time.time() + 10)
+
+    plays = Play.objects.filter(puzzle=daily, player=request.user)
+    #Show unfilled sudoku if player has not completed it
+    if len(plays) == 0:
+        context["sudoku"] = sudoku
+    else:
+        #Show completed sudoku
+        context["sudoku"] = solve_recursive_up(sudoku, copy_sudoku(sudoku), -1, 0, time.time() + 10)
+        context["message"] = context["translations"]["solved_sudoku"]
+        context["solved"] = 1
 
     return render(request, 'sudoku.html', context)
 
@@ -37,7 +49,6 @@ def random_sudoku():
     counter = 15
     while solved_up != solved_down and counter <= 20:
         print(counter)
-
         if solved_up != -1 and solved_down != -1:
             while True:
                 x = random.randrange(0,9)

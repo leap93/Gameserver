@@ -1,7 +1,14 @@
 [
-
+    {"title": "cell_unfilled", "language": "en", "content": "cell unfilled"},
+	{"title": "cell_unfilled", "language": "fi", "content": "ruutu t\u00e4ytt\u00e4m\u00e4tt\u00e4"},
+    {"title": "cells_unfilled", "language": "en", "content": "cells unfilled"},
+	{"title": "cells_unfilled", "language": "fi", "content": "ruutua t\u00e4ytt\u00e4m\u00e4tt\u00e4"},
+    {"title": "check", "language": "en", "content": "check"},
+	{"title": "check", "language": "fi", "content": "tarkista"},
 	{"title": "email", "language": "en", "content": "email"},
 	{"title": "email", "language": "fi", "content": "s\u00e4hk\u00f6postiosoite"},
+	{"title": "errors_in_solution", "language": "en", "content": "Errors in solution."},
+	{"title": "errors_in_solution", "language": "fi", "content": "Virheit\u00e4 ratkaisussa."},
 	{"title": "en", "language": "en", "content": "English"},
 	{"title": "en", "language": "fi", "content": "englanti"},
 	{"title": "fi", "language": "en", "content": "Finnish"},
@@ -38,6 +45,10 @@
 	{"title": "register", "language": "fi", "content": "rekister\u00f6idy"},
 	{"title": "register_success", "language": "en", "content": "register success"},
 	{"title": "register_success", "language": "fi", "content": "rekister\u00f6inti onnistui"},
+
+
+	{"title": "solved_sudoku", "language": "en", "content": "You have solved the daily sudoku!"},
+	{"title": "solved_sudoku", "language": "fi", "content": "Olet ratkaissut p\u00e4iv\u00e4n sudokun!"},
 	{"title": "submit", "language": "en", "content": "submit"},
 	{"title": "submit", "language": "fi", "content": "l\u00e4het\u00e4"},
 	{"title": "sudoku", "language": "en", "content": "sudoku"},

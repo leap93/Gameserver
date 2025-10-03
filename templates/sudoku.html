@@ -153,7 +153,9 @@ input {
 </table>
 
     <br>
-<button type="button" value="Check" onclick="checking()">Check</button><br>
+{% if solved == 0 %}
+<button type="button" onclick="checking()">{{translations.check}}</button><br>
+{% endif %}
 <p id="message">{{message}}</p>
 
 <form id="success" method="POST" action="{% url 'sudoku' %}">
@@ -284,20 +286,16 @@ function checking(){
 	if(zeros == 0){
         if(checkSudoku(sudoku)){
             timediff = Math.round((performance.now() - startTime)/1000)
-            mins = Math.floor(timediff/60);
-            secs = timediff % 60
-            document.getElementById("message").innerHTML = "Onnistuit! Aikaa kului "+mins+" minuuttia ja"+secs+" sekunttia.";
             document.getElementById("time").value = timediff;
             document.getElementById("success").submit();
-
         }else{
-            document.getElementById("message").innerHTML = "Virheitä ratksaisussa!";
+            document.getElementById("message").innerHTML = "{{translations.errors_in_solution}}";
         }
 	}else{
 	    if(zeros == 1){
-	        document.getElementById("message").innerHTML = "1 ruutu täyttämättä";
+	        document.getElementById("message").innerHTML = "1 {{translations.cell_unfilled}}";
 	    }else{
-	        document.getElementById("message").innerHTML = zeros + " ruutua täyttämättä";
+	        document.getElementById("message").innerHTML = zeros + " {{translations.cells_unfilled}}";
 	    }
 
 

@@ -24,10 +24,11 @@ def sudoku_view(request):
         sudoku = empty_sudoku()
         message = context["translations"]["no_daily_sudoku"]
         context["message"] = message
-    else:
-        #Load daily sudoku from database
-        daily = daily[0]
-        sudoku = json.loads(daily.puzzle_text)
+        return render(request, 'sudoku.html', context)
+
+    #Load daily sudoku from database
+    daily = daily[0]
+    sudoku = json.loads(daily.puzzle_text)
 
     plays = Play.objects.filter(puzzle=daily, player=request.user)
     #Show unfilled sudoku if player has not completed it

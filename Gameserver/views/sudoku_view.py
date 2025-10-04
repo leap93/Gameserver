@@ -24,6 +24,7 @@ def sudoku_view(request):
         sudoku = empty_sudoku()
         message = context["translations"]["no_daily_sudoku"]
         context["message"] = message
+        context["sudoku"] = sudoku
         return render(request, 'sudoku.html', context)
 
     #Load daily sudoku from database

@@ -46,10 +46,10 @@ def sudoku_view(request):
 def random_sudoku():
     sudoku = initial_sudoku(15)
 
-    solved_up = solve_recursive_up(sudoku, copy_sudoku(sudoku), -1, 0, time.time() + 10)
-    solved_down = solve_recursive_down(sudoku, copy_sudoku(sudoku), -1, 0, time.time() + 10)
+    solved_up = -1
+    solved_down = -1
     counter = 15
-    while solved_up != solved_down and counter <= 20:
+    while solved_up != solved_down and counter <= 20 and solved_down != -1 and solved_up != 0:
         print(counter)
         if solved_up != -1 and solved_down != -1:
             while True:

@@ -15,17 +15,72 @@
 <script type="text/javascript">
 const canvas = document.getElementById("wordle_canvas");
 const ctx = canvas.getContext("2d");
+var elemLeft = canvas.offsetLeft + canvas.clientLeft;
+var elemTop = canvas.offsetTop + canvas.clientTop;
 
-for(var x = 0; x <= 200; x += 50){
-    for(var y = 0; y <= 200; y+= 50){
-        ctx.rect(x,y, 50,50);
-        ctx.stroke();
+var letters = [];
+var keyboard = [];
+var characters = ["q", "w", "e", "r", "t", "y", "u", "i", "o", "p", "å", "a", "s", "d", "f", "g", "h", "j", "k", "l", "ö", "ä", "z", "x", "c", "v", "b", "n", "m"];
+
+for(var x = 0; x <= 250; x += 60){
+    for(var y = 0; y <= 250; y+= 60){
+        letters.push([x, y]);
+    }
+}
+
+for(var x = 0; x < letters.length; x++){
+    ctx.rect(letters[x][0], letters[x][1], 60,60);
+    ctx.stroke();
+}
+
+for(var x = 5; x <= 290; x += 27){
+    keyboard.push([x, 320]);
+}
+
+for(var x = 5; x <= 290; x += 27){
+    keyboard.push([x, 350]);
+}
+
+for(var x = 60; x <= 240; x += 27){
+    keyboard.push([x, 380]);
+}
+
+for(var x = 0; x < keyboard.length; x++){
+    ctx.rect(keyboard[x][0], keyboard[x][1], 15,20);
+    ctx.stroke();
+    ctx.font = "20px Arial";
+    ctx.fillText(characters[x], keyboard[x][0] + 1, keyboard[x][1] + 15);
+
+}
+
+ctx.rect(247,380, 25,20);
+ctx.stroke();
+ctx.moveTo(250, 390);
+ctx.lineTo(270, 390);
+ctx.stroke();
+ctx.moveTo(250, 390);
+ctx.lineTo(257, 397);
+ctx.stroke();
+ctx.moveTo(250, 390);
+ctx.lineTo(257, 383);
+ctx.stroke();
+
+function handleClick(){
+    var x = event.pageX - elemLeft;
+    var y = event.pageY - elemTop;
+    for(var h = 0; h < keyboard.length; h++){
+        if(x >= keyboard[h][0] && x <= keyboard[h][0] + 15 && y >= keyboard[h][1] && y <= keyboard[h][1] + 20){
+            alert(characters[h]);
+        }
+    }
+    if(x >= 247 && x <= 272 && y >= 380 && y <= 400){
+        alert("backspace");
     }
 
 
 }
 
-
+canvas.addEventListener('click', function(elem) { handleClick(elem);}, false);
 </script>
 
 </body>

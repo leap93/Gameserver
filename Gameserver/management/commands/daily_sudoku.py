@@ -14,7 +14,7 @@ class Command(BaseCommand):
         daily = DailyPuzzle.objects.filter(type="sudoku", created_at__date=date(now.year, now.month, now.day))
         if len(daily) == 0:
             sudoku = random_sudoku()
-            DailyPuzzle.objects.create(type="sudoku", puzzle_text=json.dumps(sudoku), solution=json.dumps(solve_recursive_up(sudoku, copy_sudoku(sudoku), -1, 0, time.time() + 10)))
+            DailyPuzzle.objects.create(type="sudoku", puzzle_text=json.dumps(sudoku), solution=json.dumps(solve_recursive_up(sudoku, copy_sudoku(sudoku), -1, 0, time.time() + 40)))
             self.stdout.write(self.style.SUCCESS('Sudoku created!'))
         else:
             self.stdout.write(self.style.SUCCESS('Sudoku already exists!'))

@@ -9,7 +9,7 @@
 {% include 'header.html' %}
 
 
-<canvas id="wordle_canvas" width="500" height="500"></canvas>
+<canvas id="wordle_canvas" width="330" height="410"></canvas>
 
 
 <script type="text/javascript">
@@ -21,9 +21,11 @@ var elemTop = canvas.offsetTop + canvas.clientTop;
 var letters = [];
 var keyboard = [];
 var characters = ["q", "w", "e", "r", "t", "y", "u", "i", "o", "p", "å", "a", "s", "d", "f", "g", "h", "j", "k", "l", "ö", "ä", "z", "x", "c", "v", "b", "n", "m"];
+var correct = "{{word}}";
+var valid_words = {{words|safe}};
 
-for(var x = 0; x <= 250; x += 60){
-    for(var y = 0; y <= 250; y+= 60){
+for(var y = 0; y<= 250; y += 60){
+    for(var x = 0; x <= 250; x+= 60){
         letters.push([x, y]);
     }
 }
@@ -45,14 +47,15 @@ for(var x = 60; x <= 240; x += 27){
     keyboard.push([x, 380]);
 }
 
+//draw keyboard
 for(var x = 0; x < keyboard.length; x++){
     ctx.rect(keyboard[x][0], keyboard[x][1], 15,20);
     ctx.stroke();
     ctx.font = "20px Arial";
     ctx.fillText(characters[x], keyboard[x][0] + 1, keyboard[x][1] + 15);
-
 }
 
+//draw backspace
 ctx.rect(247,380, 25,20);
 ctx.stroke();
 ctx.moveTo(250, 390);
@@ -65,21 +68,109 @@ ctx.moveTo(250, 390);
 ctx.lineTo(257, 383);
 ctx.stroke();
 
-function handleClick(){
+//drawn enter
+ctx.rect(5,380, 45,20);
+ctx.stroke();
+ctx.font = "18px Arial";
+ctx.fillText("enter", 7, 395);
+
+
+var spot = 0;
+var clicks = [];
+var next_step = false;
+var greens = []
+end = false;
+function handleClick(event){
+    if(end){
+        return;
+    }
+
     var x = event.pageX - elemLeft;
     var y = event.pageY - elemTop;
     for(var h = 0; h < keyboard.length; h++){
-        if(x >= keyboard[h][0] && x <= keyboard[h][0] + 15 && y >= keyboard[h][1] && y <= keyboard[h][1] + 20){
-            alert(characters[h]);
+        if(x >= keyboard[h][0] && x <= keyboard[h][0] + 15 && y >= keyboard[h][1] && y <= keyboard[h][1] + 20 && !next_step){
+            character = characters[h];
+            ctx.font = "55px Arial";
+            ctx.fillText(character, letters[spot][0] + 10, letters[spot][1] + 45);
+            spot++;
+            clicks.push(character);
+            if(spot % 5 == 0){
+                next_step = true;
+            }
         }
     }
-    if(x >= 247 && x <= 272 && y >= 380 && y <= 400){
-        alert("backspace");
+    if(x >= 247 && x <= 272 && y >= 380 && y <= 400 && (spot % 5 != 0 || next_step)){
+        if(spot % 5 == 0){
+            next_step = false;
+        }
+        spot--;
+        clicks.pop();
+        ctx.fillStyle = "white";
+        ctx.fillRect(letters[spot][0] + 1, letters[spot][1] + 1, 58, 58);
+        ctx.fillStyle = "black";
     }
+    if(x >= 5 && x <= 50 && y >= 380 && y <= 400 && next_step){
+        word = clicks[spot - 5] + clicks[spot - 4] + clicks[spot - 3] + clicks[spot - 2] + clicks[spot - 1];
+        correct_copy = correct
+
+        if(! valid_words.includes(word)){
+            alert("Tuntematon sana");
+        }else{
+            for(var h = spot - 5; h<spot; h++){
+                correct_copy = correct_copy.replace(clicks[h], "");
+                if(correct[h%5] == clicks[h]){
+                    fillWithColor(clicks[h], "green", letters[h][0], letters[h][1]);
+                    colorKeyboardCharacter(clicks[h], "green")
+                    greens.push(clicks[h]);
+
+                }else if(correct.indexOf(clicks[h]) == -1){
+                    colorKeyboardCharacter(clicks[h], "gray")
+                }else{
+                    if(correct_copy.includes(clicks[h])){
+                        fillWithColor(clicks[h], "yellow", letters[h][0], letters[h][1]);
+                    }
+                    if(!greens.includes(clicks[h])){
+                        colorKeyboardCharacter(clicks[h], "yellow")
+                    }
+                }
+            }
 
 
+            if(correct == word){
+                alert("Oikein!");
+                end = true;
+            }
+
+            if(spot == 25 && correct != word){
+                alert("oikea sana olisi ollut " + correct + ".");
+                end = true;
+            }
+
+            next_step = false;
+        }
+    }
 }
 
+function colorKeyboardCharacter(character, color){
+    for(var h = 0; h < characters.length; h++){
+        if(characters[h] == character){
+            ctx.fillStyle = color;
+            ctx.fillRect(keyboard[h][0], keyboard[h][1], 15,20);
+            ctx.stroke();
+            ctx.fillStyle = "black";
+            ctx.font = "20px Arial";
+            ctx.fillText(character, keyboard[h][0] + 1, keyboard[h][1] + 15);
+        }
+    }
+}
+
+function fillWithColor(letter, color, x, y){
+    ctx.fillStyle = color;
+    ctx.fillRect(x + 1, y + 1, 58, 58);
+    ctx.fillStyle = "black";
+    ctx.font = "55px Arial";
+    ctx.fillText(letter, x + 10, y + 45);
+}
 canvas.addEventListener('click', function(elem) { handleClick(elem);}, false);
 </script>
 

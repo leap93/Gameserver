@@ -9,7 +9,7 @@
 {% include 'header.html' %}
 
 
-<canvas id="wordle_canvas" width="330" height="410"></canvas>
+<canvas id="wordle_canvas" width="370" height="410"></canvas>
 
 
 <script type="text/javascript">
@@ -24,55 +24,85 @@ var characters = ["q", "w", "e", "r", "t", "y", "u", "i", "o", "p", "å", "a", "
 var correct = "{{word}}";
 var valid_words = {{words|safe}};
 
-for(var y = 0; y<= 250; y += 60){
-    for(var x = 0; x <= 250; x+= 60){
+var box_size = 50;
+var key_width = 25;
+var key_height = 25;
+var width_between = 8;
+var height_between = 10;
+
+for(var y = 0; y<= 4*box_size; y += box_size){
+    for(var x = 0; x <= 4*box_size; x+= box_size){
         letters.push([x, y]);
     }
 }
 
+//draw box
 for(var x = 0; x < letters.length; x++){
-    ctx.rect(letters[x][0], letters[x][1], 60,60);
+    ctx.rect(letters[x][0], letters[x][1], box_size,box_size);
     ctx.stroke();
 }
 
-for(var x = 5; x <= 290; x += 27){
-    keyboard.push([x, 320]);
+//first row of keyboard
+for(var x = 5; x <= 11*(key_width + width_between); x += key_width + width_between){
+    keyboard.push([x, 5*box_size + 10]);
 }
 
-for(var x = 5; x <= 290; x += 27){
-    keyboard.push([x, 350]);
+//second row of keyboard
+for(var x = 5; x <= 11*(key_width + width_between); x += key_width + width_between){
+    keyboard.push([x, 5*box_size + 10 + key_height + height_between]);
 }
 
-for(var x = 60; x <= 240; x += 27){
-    keyboard.push([x, 380]);
+//third row of keyboard
+for(var x = 5 + 2*key_width + 2*width_between; x < 7*(key_width + width_between) + 5 + 2*key_width + 2*width_between; x += key_width + width_between){
+    keyboard.push([x, 5*box_size + 10 + 2*key_height + 2*height_between]);
 }
 
 //draw keyboard
 for(var x = 0; x < keyboard.length; x++){
-    ctx.rect(keyboard[x][0], keyboard[x][1], 15,20);
+    ctx.rect(keyboard[x][0], keyboard[x][1], key_width,key_height);
     ctx.stroke();
     ctx.font = "20px Arial";
     ctx.fillText(characters[x], keyboard[x][0] + 1, keyboard[x][1] + 15);
 }
 
 //draw backspace
-ctx.rect(247,380, 25,20);
+bp_x = 5 + 9*key_width + 9*width_between
+bp_y = 5*box_size + 10 + 2*key_height + 2*height_between
+bp_dx = 2*key_width + width_between
+bp_dy = key_height
+
+ctx.rect(bp_x,bp_y, bp_dx,bp_dy);
 ctx.stroke();
-ctx.moveTo(250, 390);
-ctx.lineTo(270, 390);
+ctx.moveTo(bp_x+bp_dx*0.1, bp_y + bp_dy/2);
+ctx.lineTo(bp_x+bp_dx*0.8, bp_y + bp_dy/2);
 ctx.stroke();
-ctx.moveTo(250, 390);
-ctx.lineTo(257, 397);
+ctx.moveTo(bp_x+bp_dx*0.1, bp_y + bp_dy/2);
+ctx.lineTo(bp_x+bp_dx*0.4, bp_y);
 ctx.stroke();
-ctx.moveTo(250, 390);
-ctx.lineTo(257, 383);
+ctx.moveTo(bp_x+bp_dx*0.1, bp_y + bp_dy/2);
+ctx.lineTo(bp_x+bp_dx*0.4, bp_y+bp_dy);
 ctx.stroke();
 
-//drawn enter
-ctx.rect(5,380, 45,20);
+//draw enter
+enter_x = 5
+enter_y = 5*box_size + 10 + 2*key_height + 2*height_between
+enter_dx = 2*key_width + width_between
+enter_dy = key_height
+
+ctx.rect(enter_x, enter_y, enter_dx, enter_dy);
 ctx.stroke();
-ctx.font = "18px Arial";
-ctx.fillText("enter", 7, 395);
+ctx.moveTo(enter_x+enter_dx*0.1, enter_y + enter_dy/2);
+ctx.lineTo(enter_x+enter_dx*0.8, enter_y + enter_dy/2);
+ctx.stroke();
+ctx.moveTo(enter_x+enter_dx*0.9, enter_y + enter_dy/2);
+ctx.lineTo(enter_x+enter_dx*0.6, enter_y);
+ctx.stroke();
+ctx.moveTo(enter_x+enter_dx*0.9, enter_y + enter_dy/2);
+ctx.lineTo(enter_x+enter_dx*0.6, enter_y+enter_dy);
+ctx.stroke();
+ctx.moveTo(enter_x+enter_dx*0.1, enter_y + enter_dy/2);
+ctx.lineTo(enter_x+enter_dx*0.1, enter_y);
+ctx.stroke();
 
 
 var spot = 0;
@@ -88,28 +118,32 @@ function handleClick(event){
     var x = event.pageX - elemLeft;
     var y = event.pageY - elemTop;
     for(var h = 0; h < keyboard.length; h++){
-        if(x >= keyboard[h][0] && x <= keyboard[h][0] + 15 && y >= keyboard[h][1] && y <= keyboard[h][1] + 20 && !next_step){
+        //a key was clicked
+        if(x >= keyboard[h][0] && x <= keyboard[h][0] + key_width && y >= keyboard[h][1] && y <= keyboard[h][1] + key_height && !next_step){
             character = characters[h];
-            ctx.font = "55px Arial";
-            ctx.fillText(character, letters[spot][0] + 10, letters[spot][1] + 45);
+            ctx.font = box_size-5+"px Arial";
+            ctx.fillText(character, letters[spot][0] + 5, letters[spot][1] + 0.75*box_size);
             spot++;
             clicks.push(character);
             if(spot % 5 == 0){
                 next_step = true;
             }
+            break;
         }
     }
-    if(x >= 247 && x <= 272 && y >= 380 && y <= 400 && (spot % 5 != 0 || next_step)){
+    //backspace was clicked
+    if(x >= bp_x && x <= bp_x+bp_dx && y >= bp_y && y <= bp_y+bp_dy && (spot % 5 != 0 || next_step)){
         if(spot % 5 == 0){
             next_step = false;
         }
         spot--;
         clicks.pop();
         ctx.fillStyle = "white";
-        ctx.fillRect(letters[spot][0] + 1, letters[spot][1] + 1, 58, 58);
+        ctx.fillRect(letters[spot][0] + 1, letters[spot][1] + 1, box_size - 2, box_size - 2);
         ctx.fillStyle = "black";
     }
-    if(x >= 5 && x <= 50 && y >= 380 && y <= 400 && next_step){
+    //enter was clicked
+    if(x >= enter_x && x <= enter_x + enter_dx && y >= enter_y && y <= enter_y + enter_dy && next_step){
         word = clicks[spot - 5] + clicks[spot - 4] + clicks[spot - 3] + clicks[spot - 2] + clicks[spot - 1];
         correct_copy = correct
 
@@ -117,24 +151,26 @@ function handleClick(event){
             alert("Tuntematon sana");
         }else{
             for(var h = spot - 5; h<spot; h++){
-                correct_copy = correct_copy.replace(clicks[h], "");
                 if(correct[h%5] == clicks[h]){
                     fillWithColor(clicks[h], "green", letters[h][0], letters[h][1]);
                     colorKeyboardCharacter(clicks[h], "green")
                     greens.push(clicks[h]);
-
-                }else if(correct.indexOf(clicks[h]) == -1){
+                    correct_copy = correct_copy.replace(clicks[h], "");
+                }
+            }
+            for(var h = spot - 5; h<spot; h++){
+                if(correct.indexOf(clicks[h]) == -1){
                     colorKeyboardCharacter(clicks[h], "gray")
-                }else{
+                }else if(correct[h%5] != clicks[h]){
                     if(correct_copy.includes(clicks[h])){
                         fillWithColor(clicks[h], "yellow", letters[h][0], letters[h][1]);
+                        correct_copy = correct_copy.replace(clicks[h], "");
                     }
                     if(!greens.includes(clicks[h])){
                         colorKeyboardCharacter(clicks[h], "yellow")
                     }
                 }
             }
-
 
             if(correct == word){
                 alert("Oikein!");
@@ -155,7 +191,7 @@ function colorKeyboardCharacter(character, color){
     for(var h = 0; h < characters.length; h++){
         if(characters[h] == character){
             ctx.fillStyle = color;
-            ctx.fillRect(keyboard[h][0], keyboard[h][1], 15,20);
+            ctx.fillRect(keyboard[h][0], keyboard[h][1], key_width,key_height);
             ctx.stroke();
             ctx.fillStyle = "black";
             ctx.font = "20px Arial";
@@ -166,10 +202,10 @@ function colorKeyboardCharacter(character, color){
 
 function fillWithColor(letter, color, x, y){
     ctx.fillStyle = color;
-    ctx.fillRect(x + 1, y + 1, 58, 58);
+    ctx.fillRect(x + 1, y + 1, box_size - 2, box_size - 2);
     ctx.fillStyle = "black";
-    ctx.font = "55px Arial";
-    ctx.fillText(letter, x + 10, y + 45);
+    ctx.font = box_size-5+"px Arial";
+    ctx.fillText(letter, x + 5, y + 0.75*box_size);
 }
 canvas.addEventListener('click', function(elem) { handleClick(elem);}, false);
 </script>

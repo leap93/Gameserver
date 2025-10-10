@@ -49,7 +49,7 @@ def random_sudoku():
     solved_up = -1
     solved_down = -1
     counter = 15
-    while solved_up != solved_down and counter <= 20 and solved_down != -1 and solved_up != 0:
+    while solved_up != solved_down or counter <= 28 or solved_down == -1 or solved_down == 0 or solved_up == -1 or solved_up == 0:
         print(counter)
         if solved_up != -1 and solved_down != -1:
             while True:
@@ -70,19 +70,19 @@ def random_sudoku():
         if solved_down != 0 and solved_down != -1:
             solved_up = solve_recursive_up(sudoku, copy_sudoku(sudoku), -1, 0, time.time() + 10)
         counter += 1
-        if counter > 35 or solved_up == -1 or solved_down == -1 or solved_up == 0 or solved_down == 0:
-            if counter > 35:
-                print("Too easy sudoku")
-            if solved_up == -1 or solved_down == -1:
+        if counter > 40 or solved_up == -1 or solved_down == -1 or solved_up == 0 or solved_down == 0:
+            if (solved_up == -1 or solved_down == -1) and counter <=40:
                 print("Timeout")
                 continue
+            if counter > 40:
+                print("Too easy sudoku")
             if solved_up == 0 or solved_down == 0:
                 print("No solution")
+            print("Resetting")
             sudoku = initial_sudoku(10)
             counter = 10
             solved_up = solve_recursive_up(sudoku, copy_sudoku(sudoku), -1, 0, time.time() + 10)
             solved_down = solve_recursive_down(sudoku, copy_sudoku(sudoku), -1, 0, time.time() + 10)
-
     return sudoku
 
 def print_sudoku(sudoku):

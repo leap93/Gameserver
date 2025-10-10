@@ -15,7 +15,7 @@ def sudoku_view(request):
 
     #Create Play obejct if player has completed the sudoku
     if request.method == "POST":
-        dailies = Play.objects.filter(puzzle=daily, created_at__date=date(now.year, now.month, now.day), player=request.user)
+        dailies = Play.objects.filter(puzzle=daily[0], created_at__date=date(now.year, now.month, now.day), player=request.user)
         if len(dailies) == 0:
             Play.objects.create(puzzle=daily, player=request.user, attempts=1, time=request.POST['time'])
 

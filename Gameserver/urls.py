@@ -19,7 +19,7 @@ from django.urls import path
 from Gameserver.views import login_view, register_view, front_page_view, sudoku_view, logout_view, wordle_view
 
 urlpatterns = [
-    path('login/', login_view.login_view, name='login'),
+    path('/', login_view.login_view, name='login'),
     path('register/', register_view.register_view, name='register'),
     path('front_page/', front_page_view.front_page_view, name='front_page'),
     path('sudoku/', sudoku_view.sudoku_view, name='sudoku'),

@@ -8,10 +8,15 @@
 <body>
 {% include 'header.html' %}
 
-
+{% if not attempted == 1 %}
 <canvas id="wordle_canvas" width="370" height="410"></canvas>
-
-
+{% endif %}
+<form id="attempt" method="POST" action="{% url 'wordle' %}">
+    {% csrf_token %}
+    <input type="hidden" name="time" id="time">
+    <input type="hidden" name="attempts" id="attempts">
+</form>
+<p id="message">{% if attempted == 1 %}{% if attempts < 6 %}Onnistuit tänään {{attempts}} yrityksellä!{% else %}Et onnistunut tänään!{% endif %} Oikea sana oli {{word}}{% endif %}</p>
 <script type="text/javascript">
 const canvas = document.getElementById("wordle_canvas");
 const ctx = canvas.getContext("2d");
@@ -174,11 +179,19 @@ function handleClick(event){
 
             if(correct == word){
                 alert("Oikein!");
+                timediff = Math.round((performance.now() - startTime)/1000)
+                document.getElementById("time").value = timediff;
+                document.getElementById("attempts").value = spot / 5;
+                document.getElementById("attempt").submit();
                 end = true;
             }
 
             if(spot == 25 && correct != word){
                 alert("oikea sana olisi ollut " + correct + ".");
+                timediff = Math.round((performance.now() - startTime)/1000)
+                document.getElementById("time").value = timediff;
+                document.getElementById("attempts").value = spot / 5 + 1;
+                document.getElementById("attempt").submit();
                 end = true;
             }
 
@@ -208,6 +221,7 @@ function fillWithColor(letter, color, x, y){
     ctx.fillText(letter, x + 5, y + 0.75*box_size);
 }
 canvas.addEventListener('click', function(elem) { handleClick(elem);}, false);
+const startTime = performance.now()
 </script>
 
 </body>

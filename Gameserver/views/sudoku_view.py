@@ -1,4 +1,6 @@
 from datetime import date
+
+from django.contrib.auth.decorators import login_required
 from django.shortcuts import render
 from app.models import DailyPuzzle, Play
 from app.utils import get_translations
@@ -6,14 +8,14 @@ import random, json
 from datetime import datetime
 import time
 
-
+@login_required
 def sudoku_view(request):
     language = request.user.userinfo.language
     now = datetime.now()
     daily = DailyPuzzle.objects.filter(type="sudoku", created_at__date=date(now.year, now.month, now.day))
     context = {'translations': get_translations(language), "language": language, "solved": 0}
 
-    #Create Play obejct if player has completed the sudoku
+    #Create Play object if player has completed the sudoku
     if request.method == "POST":
         dailies = Play.objects.filter(puzzle=daily[0], created_at__date=date(now.year, now.month, now.day), player=request.user)
         if len(dailies) == 0:

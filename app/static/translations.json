@@ -5,6 +5,8 @@
 	{"title": "cells_unfilled", "language": "fi", "content": "ruutua t\u00e4ytt\u00e4m\u00e4tt\u00e4"},
     {"title": "check", "language": "en", "content": "check"},
 	{"title": "check", "language": "fi", "content": "tarkista"},
+    {"title": "chess", "language": "en", "content": "chess"},
+	{"title": "chess", "language": "fi", "content": "shakki"},
 	{"title": "email", "language": "en", "content": "email"},
 	{"title": "email", "language": "fi", "content": "s\u00e4hk\u00f6postiosoite"},
 	{"title": "errors_in_solution", "language": "en", "content": "Errors in solution."},

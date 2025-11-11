@@ -1,5 +1,6 @@
 {% load static %}
 <html>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<head>
 		<title>
 			Shakkia!
@@ -186,7 +187,7 @@
 					board = new Board(newGame());
 					piece = null;
 					refreshBoard();
-					document.getElementById("info").value = "Uusi peli aloitettu. Onnea!";
+					document.getElementById("info").value = "{{translations.new_game_started}}";
 				}
 			}
 
@@ -205,7 +206,7 @@
 						//moves that do not cause check
 						moves = filteredMoves(moves, "w");
 						if(moves.length == 0){
-							document.getElementById("info").value = "Ei sallittuja siirtoja!";
+							document.getElementById("info").value = "{{translations.no_allowed_moves}}";
 						}else{
 							//Color all possible moves with red
 							for(var i = 0; i < moves.length; i++){
@@ -229,7 +230,7 @@
 						refreshBoard();
 
 					//if the move is legal and does not cause check
-					}else if(true || piece.isLegalMove(x, y, board) && !kingChecked(move, "w")){
+					}else if(piece.isLegalMove(x, y, board) && !kingChecked(move, "w")){
 						move.execute();
 						document.getElementById("info").value = "";
 						refreshBoard();
@@ -239,7 +240,7 @@
 						setTimeout(opponentMove, 10);
 					}else{
 						//illegal move selected
-						document.getElementById("info").value = "Laiton siirto!";
+						document.getElementById("info").value = "{{translations.illegal_move}}";
 						refreshBoard();
 					}
 
@@ -293,7 +294,7 @@
 						var move = pickMove(color == "w", 4, false);
 
 						if(move === null){
-							document.getElementById("info").value = "Voitit!";
+							document.getElementById("info").value = "{{translations.won}}";
 						}else{
 							move.execute(board);
 							refreshBoard();
@@ -302,7 +303,7 @@
 							document.getElementById(String(move.x)+String(move.y)).src = imageReplace(document.getElementById(String(move.x)+String(move.y)).src, "r.png");
 							document.getElementById(String(move.dx)+String(move.dy)).src = imageReplace(document.getElementById(String(move.dx)+String(move.dy)).src, "r" + move.piece.name + ".png");
 							if(filteredMoves(allLegalMoves("w", board), "w").length == 0){
-								document.getElementById("info").value = "Hävisit!";
+								document.getElementById("info").value = "{{translations.lost}}";
 							}
 						}
 						setTimeout(function(){isLocked = false;}, 10);
@@ -1023,7 +1024,7 @@
 				</td>
 			</tr>
 		</table>
-		<input type="text" readonly="readonly" id="info" size="200" value="Uusi peli aloitettu. Onnea!"><br>
-		<button onclick="masterUndo()">Peruuta</button><button onclick="reset()">Uusi peli</button><button onclick="suggest()">Suosittele siirtoa</button>
+		<input type="text" readonly="readonly" id="info" size="100" value="{{translations.new_game_started}}"><br>
+		<button onclick="masterUndo()">{{translations.cancel}}</button><button onclick="reset()">{{translations.new_game}}</button><button onclick="suggest()">{{translations.suggest_move}}</button>
 </body>
 </html>

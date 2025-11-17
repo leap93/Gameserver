@@ -33,6 +33,11 @@ def sudoku_view(request):
     daily = daily[0]
     sudoku = json.loads(daily.puzzle_text)
 
+    for x in range(len(sudoku)):
+        for y in range(len(sudoku[x])):
+            if sudoku[x][y] == 0:
+                sudoku[x][y] = ""
+
     plays = Play.objects.filter(puzzle=daily, player=request.user)
     #Show unfilled sudoku if player has not completed it
     if len(plays) == 0:

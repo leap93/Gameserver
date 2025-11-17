@@ -26,6 +26,7 @@ def wordle_view(request):
         else:
             word = random.choice(data)
             DailyPuzzle.objects.create(type="wordle", solution=word)
+            daily = DailyPuzzle.objects.filter(type="wordle", created_at__date=date(now.year, now.month, now.day))
         context['word'] = word
         context['words'] = data
 
